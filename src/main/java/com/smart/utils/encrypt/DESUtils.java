@@ -1,5 +1,7 @@
 package com.smart.utils.encrypt;
 
+import org.springframework.util.Assert;
+
 import javax.crypto.*;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -11,7 +13,7 @@ import java.util.Base64;
 /**
  * @author wzy
  */
-public class DESUtil {
+public class DESUtils {
 
     //指定DES加密解密所用的密钥
     private static Key key;
@@ -30,6 +32,8 @@ public class DESUtil {
 
     //对字符串进行DES加密，返回BASE64编码的加密字符串
     public static String getEncryptString(String str) {
+        Assert.isTrue(str != null && !str.equals(""), "未传入字符串！");
+        str = str.trim();
         try {
             byte[] strBytes = str.getBytes("UTF8");
             Cipher cipher = Cipher.getInstance("DES");
@@ -55,6 +59,8 @@ public class DESUtil {
 
     //对BASE64编码的加密字符串进行解密，返回解密后的字符串
     public static String getDecryptString(String str) {
+        Assert.isTrue(str != null && !str.equals(""), "未传入字符串！");
+        str = str.trim();
         byte[] strBytes = Base64.getDecoder().decode(str);
         try {
             Cipher cipher = Cipher.getInstance("DES");
