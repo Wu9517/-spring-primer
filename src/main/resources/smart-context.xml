@@ -2,6 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:tx="http://www.springframework.org/schema/tx"
@@ -12,7 +13,9 @@
        http://www.springframework.org/schema/tx
        http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
        http://www.springframework.org/schema/aop
-       http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+       http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
     <!--1.扫描dao类包，将标注spring类注解的类自动转化为bean，同时完成bean的注入-->
     <context:component-scan base-package="com.smart.dao"/>
@@ -26,7 +29,7 @@
           p:location="classpath:config.properties"
           p:fileEncoding="utf-8"/>
 
-
+    <!--${}为EL表达式，具体使用可查看com.smart.SpEL包-->
     <!-- 2.定义一个使用DBCP实现的数据源，destroy-method="close" 关闭资源-->
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
           destroy-method="close"
@@ -47,6 +50,11 @@
     <!--注册bean，实现自定义的事件发布与监听-->
     <bean id="mailSender" class="com.smart.event.MailSender"/>
     <bean class="com.smart.event.MailSendListener"/>
+
+    <!--xmlns需声明util相关xml文档,classpath:SpEL_test.properties被加载后，
+    文件里的值会被存入MyDataSource的注解属性中，可在配置文件中通过${field}的形式访问-->
+    <util:properties id="properties" location="classpath:SpEL_test.properties"/>
+    <context:property-placeholder properties-ref="properties"/>
 
     <!--3. 定义jdbc模板Bean-->
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate"
@@ -71,4 +79,12 @@
           p:viewClass="org.springframework.web.servlet.view.JstlView"
           p:prefix="/WEB-INF/jsp/"
           p:suffix=".jsp"></bean>
+
+    <!--使用SpEL表达式为bean属性注入动态值-->
+    <bean id="SystemPropertyBean" class="com.smart.SpEl.SystemPropertyBean"
+          p:osName="#{systemProperties['os.name']}"
+          p:javaHome="#{systemProperties['java.home']}"
+          p:classPath="#{systemProperties['java.class.path']}"
+          p:javaVersion="#{systemProperties['java.class.path']}"
+          p:randomNumber="#{T(java.lang.Math).random()*100.0}"></bean>
 </beans>

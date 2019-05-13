@@ -127,6 +127,15 @@
             <version>1.2.17</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.springframework/spring-expression
+        用于支出SpEL表达式，独立运行的模块，可脱离Spring容器直接运行-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-expression</artifactId>
+            <version>4.3.17.RELEASE</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
