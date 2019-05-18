@@ -24,6 +24,9 @@
     <!--6.扫描web包，应用spring的注解-->
     <context:component-scan base-package="com.smart.web"/>
 
+    <!--引入websocket-->
+    <!--<import resource="spring-websocket.xml"/>-->
+
     <!--使用自定义的EncryptPropertyPlaceholderConfigurer类来加载属性文件-->
     <bean class="com.smart.config.EncryptPropertyPlaceholderConfigurer"
           p:location="classpath:config.properties"
@@ -60,20 +63,32 @@
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate"
           p:dataSource-ref="dataSource"/>
 
-    <!--5.配置事务管理器-->
+    <!--5.配置事务管理器,Spirng JDBC和MyBatis使用DataSourceTransactionManager数据源-->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
           p:dataSource-ref="dataSource"/>
 
+    <!--使用切面表达式语言定义目标方法-->
     <aop:config proxy-target-class="true">
+        <!--通过AOP定义事务增强切面-->
         <aop:pointcut id="serviceMethod" expression="(execution(* com.smart.service..*(..))) and
                                          (@annotation(org.springframework.transaction.annotation.Transactional))"/>
+        <!--引用事务增强-->
         <aop:advisor pointcut-ref="serviceMethod" advice-ref="txAdvice"/>
     </aop:config>
+    <!--事务增强-->
     <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <!--事务属性定义-->
         <tx:attributes>
-            <tx:method name="*"/>
+            <tx:method name="get*" read-only="true" propagation="NOT_SUPPORTED"/>
+            <tx:method name="find*" read-only="true" propagation="NOT_SUPPORTED"/>
+            <tx:method name="search*" read-only="true" propagation="NOT_SUPPORTED"/>
+            <tx:method name="query*" read-only="true" propagation="NOT_SUPPORTED"/>
+            <tx:method name="has*" read-only="true" propagation="NOT_SUPPORTED"/>
+            <tx:method name="check*" read-only="true" propagation="NOT_SUPPORTED"/>
+            <tx:method name="*" propagation="REQUIRED"/>
         </tx:attributes>
     </tx:advice>
+
     <!--7.配置视图解析器，将ModelAndView及字符串解析为具体的页面，给返回的视图名加上前缀和后缀,需要导入spring-webMVC的jar包-->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
           p:viewClass="org.springframework.web.servlet.view.JstlView"

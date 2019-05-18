@@ -19,7 +19,7 @@ public class LoginController {
     private UserService userService;
 
     @RequestMapping(value = "/index.html")
-    public String loginPage() {
+    public String loginPage(HttpServletRequest request) {
         return "login";
     }
 
